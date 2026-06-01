@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <title>じゃんけんゲーム with チートモード</title>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;700&display=swap" rel="stylesheet">
+  <style>
+    /* 基本設定 */
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: 'Outfit', sans-serif;
+      background: linear-gradient(135deg, #1e1e2f, #12121a);
+      color: #fff;
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+    }
+
+    h1 {
+      font-size: 3rem;
+      margin-bottom: 1rem;
+      color: #fff;
+      text-shadow: 2px 2px 8px rgba(255, 255, 255, 0.2);
+    }
+
+    .subtitle {
+      font-size: 1.2rem;
+      margin-bottom: 2rem;
+      color: #aaa;
+    }
+
+    .button-group {
+      display: flex;
+      gap: 1rem;
+      margin-bottom: 2rem;
+    }
+
+    button {
+      padding: 0.8rem 1.5rem;
+      font-size: 1.2rem;
+      border: none;
+      border-radius: 8px;
+      background: #2c2c3d;
+      color: #fff;
+      cursor: pointer;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.4);
+      transition: all 0.3s ease;
+    }
+
+    button:hover {
+      background: #5c00ff;
+      color: #fff;
+      transform: translateY(-2px) scale(1.05);
+      box-shadow: 0 0 10px #5c00ff, 0 0 20px #5c00ff33;
+    }
+
+    #cheatMode {
+      transform: scale(1.5);
+      margin-right: 10px;
+    }
+
+    label {
+      display: flex;
+      align-items: center;
+      font-weight: bold;
+      font-size: 1.1rem;
+      margin-bottom: 1.5rem;
+      color: #eee;
+    }
+
+    #result {
+      font-size: 1.6rem;
+      font-weight: bold;
+      min-height: 2em;
+      transition: color 0.3s ease;
+      text-shadow: 1px 1px 3px rgba(0,0,0,0.5);
+    }
+
+    /* 勝敗の結果をネオンカラーで表示するためのクラスたち */
+    /* JavaScriptで .win / .lose / .draw を result 要素に追加することで色が変わる */
+    .win { color: #57aaff; }
+    .lose { color: #ff5555; }
+    .draw { color: #00ff99; }
+
+    /* 背景に敷かれたアニメーション用レイヤー */
+    /* 通常時はグラデ背景、チートモード時にアニメが発動 */
+    .overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: -1;
+      pointer-events: none;
+      background: linear-gradient(135deg, #1e1e2f, #12121a);
+      transition: background 1s ease;
+    }
+
+    /* チートモードがONになったときに適用されるアニメーション */
+    /* bodyに .cheat-active がつくと .overlay にこのアニメが発動 */
+    .cheat-active .overlay {
+      animation: cheatGlow 1s infinite alternate;
+    }
+    /* 背景が変化する演出（紫色） */
+    @keyframes cheatGlow {
+      0%   { background: #2e003e; }
+      100% { background: #5e00a0; }
+    }
+  </style>
+</head>
+<body>
+  <!-- チートモードON時に背景を変化させるための専用要素。CSSで制御されます -->
+  <div class="overlay"></div>
+
+  <h1>じゃんけんゲーム</h1>
+  <p class="subtitle">普通のじゃんけん... と思いきや？</p>
+
+  <div class="button-group">
+    <button>✊ グー</button>
+    <button>✌️ チョキ</button>
+    <button>🖐 パー</button>
+  </div>
+
+  <!-- チートモードのON/OFFを切り替えるチェックボックス -->
+  <!-- JavaScriptでこのチェック状態を取得するには getElementById('cheatMode') を使います -->
+  <label>
+    <input type="checkbox" id="cheatMode"> チートモードをONにする
+  </label>
+
+  <!-- 勝敗の結果を表示するエリア -->
+  <!-- JavaScriptでここにテキストを表示するには getElementById('result') を使います -->
+  <p id="result"></p>
+
+  <script>
+  // =========================================
+    const buttons = document.querySelectorAll(".button-group button");
+    const result = document.getElementById("result");
+    const cheatMode = document.getElementById("cheatMode");
+    const hands = ["グー", "チョキ", "パー"];
+
+    buttons.forEach((button, playerIndex) => {
+      button.addEventListener("click", function () {
+        let cpuIndex;
+        if (cheatMode.checked) {
+            cpuIndex = (playerIndex + 1) % 3;
+        } else {
+            cpuIndex = Math.floor(Math.random() * 3);
+        }
+        const playerHand = hands[playerIndex];
+        const cpuHand = hands[cpuIndex];
+        let resultMessage = "";
+
+        if (playerIndex === cpuIndex) {
+            resultMessage = "あいこ！";
+        } else if (
+            (playerIndex === 0 && cpuIndex === 1) || 
+            (playerIndex === 1 && cpuIndex === 2) || 
+            (playerIndex === 2 && cpuIndex === 0)
+        ) {
+            resultMessage = "あなたの勝ち！";
+        } else {
+            resultMessage = "あなたの負け！";
+        }
+        result.innerHTML = `あなた:${playerHand}CPU:${cpuHand}→${resultMessage}`;
+
+    });
+});
+  // =========================================
+  </script>
+</body>
+</html>
